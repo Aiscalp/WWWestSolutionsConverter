@@ -1,30 +1,56 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div class="navbar">
+    <div>Актуальний курс валют</div>
+    <div class="navbar__btns">
+      <button class="btn" @click="$router.push('/')">Курс валют</button>
+      <button
+        class="btn"
+        style="margin-left: 20px"
+        @click="$router.push('/converter')"
+      >
+        Конвертер валют
+      </button>
+    </div>
+  </div>
+  <div class="app">
+    <suspense>
+      <router-view />
+    </suspense>
+  </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script></script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-nav {
-  padding: 30px;
+.app {
+  padding: 20px;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+.navbar {
+  height: 50px;
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 4px gray;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.navbar__btns {
+  margin-left: auto;
+}
+
+.btn {
+  padding: 10px 15px;
+  background-color: whitesmoke;
+  box-shadow: 2px 2px 4px gray;
+  border-radius: 5px;
+  color: black;
+  border: 1px solid darkgray;
 }
 </style>
