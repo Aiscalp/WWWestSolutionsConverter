@@ -14,10 +14,10 @@
       <p class="row">Валюта (Позначення)</p>
       <p v-if="currs.length > 0" class="row">Ціна в {{ currs[0].txt }}</p>
       <p v-else class="row">Ціна в {{ uah[0].txt }}</p>
-      <!-- <p class="row_check">Обрати</p> -->
+      <p class="row_check">Обрати</p>
     </div>
     <!-- Українська гривня(UAH) -->
-    <div class="v-table_row" v-for="(row, index) in uah" :key="index">
+    <!-- <div class="v-table_row" v-for="(row, index) in uah" :key="index">
       <div class="row">{{ row.txt }} ({{ row.cc }})</div>
       <div v-if="currs.length > 0" class="row">
         {{ (row.rate / convertToCC).toFixed(4) }}
@@ -25,14 +25,8 @@
       <div v-else class="row">
         {{ row.rate.toFixed(4) }}
       </div>
-      <!-- <input
-        @change="favourits"
-        class="check"
-        type="checkbox"
-        id="checkbox"
-        v-model="checked"
-      /> -->
-    </div>
+      <input class="check" type="checkbox" id="checkbox" v-model="checked" />
+    </div> -->
     <div class="v-table_row" v-for="(row, index) in currency" :key="index">
       <div class="row">{{ row.txt }} ({{ row.cc }})</div>
       <div v-if="currs.length > 0" class="row">
@@ -41,13 +35,13 @@
       <div v-else class="row">
         {{ row.rate.toFixed(4) }}
       </div>
-      <!-- <input
-        @change="favourits"
+      <input
+        @change="saveToLocalStorage"
         class="check"
         type="checkbox"
         id="checkbox"
-        v-model="checked"
-      /> -->
+        v-model="row.isFavourit"
+      />
     </div>
   </div>
 </template>
@@ -70,18 +64,41 @@ const uah = [
 
 convertTo.value = uah[0].cc;
 
-const currency = ref<Array<CurrencyModel>>(
-  await useCurrencyService().getCurrs()
-);
+const currency = ref<Array<CurrencyModel>>(await getCurrencies());
+currency.value = currency.value.sort((x) => (x.isFavourit ? -1 : 1));
 
-const checked = ref<boolean>(false);
-// async function favourits() {
-//   if (checked.value === true) {
-//     currency.value[].isFavourit = true;
-//     } else {
-//       currency.value[].isFavourit = false;
-//     }
-// }
+async function getCurrencies(): Promise<CurrencyModel[]> {
+  const json = localStorage.getItem("favs");
+
+  var currrs = await useCurrencyService().getCurrs();
+  if (json && currrs.length > 0) {
+    const favs1 = JSON.parse(json);
+    console.log(favs1);
+    favs1.forEach(function (value: CurrencyModel) {
+      let item1 = currrs.filter((item) => item.cc == value.cc)[0];
+      item1.isFavourit = true;
+    });
+  }
+
+  return currrs;
+}
+
+function saveToLocalStorage() {
+  console.clear();
+  const favs: CurrencyModel[] = [];
+
+  if (currency.value.length > 0) {
+    currency.value
+      .filter((curr) => curr.isFavourit)
+      .forEach(function (value) {
+        favs.push(value);
+      });
+
+    console.log(favs);
+    localStorage.setItem("favs", JSON.stringify(favs));
+  }
+  return currency.value.sort((x) => (x.isFavourit ? -1 : 1));
+}
 
 async function exchangeRate() {
   if (convertTo.value !== undefined) {
